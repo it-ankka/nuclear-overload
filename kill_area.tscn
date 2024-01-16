@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bhb7lfbfcmgqe"]
+
+[ext_resource type="Script" path="res://KillAreaComponent.cs" id="1_x0f4u"]
+
+[node name="KillArea" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_x0f4u")

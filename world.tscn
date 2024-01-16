@@ -1,9 +1,32 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvrdaefmuoxg5"]
+[gd_scene load_steps=8 format=3 uid="uid://dvrdaefmuoxg5"]
 
 [ext_resource type="Material" uid="uid://k860m0p38lm2" path="res://placeholder_material.tres" id="1_fnff3"]
 [ext_resource type="PackedScene" uid="uid://crmv6adiul5ca" path="res://player.tscn" id="2_yr7im"]
+[ext_resource type="PackedScene" uid="uid://bhb7lfbfcmgqe" path="res://kill_area.tscn" id="3_r8r7a"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tyy1c"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_5ymyx"]
+sky_material = SubResource("ProceduralSkyMaterial_tyy1c")
+
+[sub_resource type="Environment" id="Environment_fkdue"]
+background_mode = 2
+sky = SubResource("Sky_5ymyx")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_27yxx"]
 
 [node name="World" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_fkdue")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.962, -21.15)
@@ -14,9 +37,15 @@ size = Vector3(15, 4, 50)
 material = ExtResource("1_fnff3")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D/CSGBox3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10.0146)
 operation = 2
-size = Vector3(14, 4, 49)
+size = Vector3(14, 4, 69.0293)
 material = ExtResource("1_fnff3")
 
 [node name="Player" parent="." instance=ExtResource("2_yr7im")]
+
+[node name="KillArea" parent="." instance=ExtResource("3_r8r7a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillArea"]
+shape = SubResource("WorldBoundaryShape3D_27yxx")
