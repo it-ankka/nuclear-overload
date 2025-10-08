@@ -1,0 +1,81 @@
+[gd_scene load_steps=10 format=3 uid="uid://crmv6adiul5ca"]
+
+[ext_resource type="Script" uid="uid://ik2bxs0i5eva" path="res://godot-utils/scenes/player/player_fps_controller/PlayerFpsController.cs" id="1_oajxd"]
+[ext_resource type="PackedScene" uid="uid://66r5w7wh47o8" path="res://scenes/gun.tscn" id="2_o0k7r"]
+[ext_resource type="PackedScene" uid="uid://djftxkps5voyo" path="res://scenes/player_shoot_component.tscn" id="3_4e6kw"]
+[ext_resource type="PackedScene" uid="uid://dab3v7kut12qg" path="res://godot-utils/scenes/player/player_fps_controller/juice/player_juice_component.tscn" id="4_1k7jn"]
+[ext_resource type="PackedScene" uid="uid://bhwew2ta2wwyl" path="res://scenes/explosion_effect.tscn" id="4_vnxro"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rf7f0"]
+albedo_color = Color(0.521569, 0.764706, 0.709804, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4xgky"]
+material = SubResource("StandardMaterial3D_rf7f0")
+top_radius = 0.3
+bottom_radius = 0.3
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1gvt0"]
+radius = 0.3
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_oq7kc"]
+height = 1.2
+radius = 0.3
+
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Cam", "Head", "Arms", "StandingCollisionShape", "CrouchingCollisionShape", "CrouchCheckRay")]
+collision_layer = 2
+floor_snap_length = 0.3
+script = ExtResource("1_oajxd")
+Cam = NodePath("Head/Camera3D")
+Head = NodePath("Head")
+Arms = NodePath("Head/Camera3D/Arms")
+StandingCollisionShape = NodePath("StandingCollisionShape3D")
+CrouchingCollisionShape = NodePath("CrouchingCollisionShape3D")
+CrouchCheckRay = NodePath("CrouchCheckRay")
+AirControl = 1.0
+SlidingDeceleration = 1.0
+
+[node name="CrouchCheckRay" type="RayCast3D" parent="."]
+target_position = Vector3(0, 2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_4xgky")
+
+[node name="StandingCollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_1gvt0")
+
+[node name="CrouchingCollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("CylinderShape3D_oq7kc")
+disabled = true
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true
+fov = 90.0
+
+[node name="Arms" type="Node3D" parent="Head/Camera3D"]
+
+[node name="RightHand" type="Node3D" parent="Head/Camera3D/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.271, -0.243, -0.313)
+
+[node name="Gun" parent="Head/Camera3D/Arms/RightHand" instance=ExtResource("2_o0k7r")]
+
+[node name="LeftHand" type="Node3D" parent="Head/Camera3D/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.271, -0.243, -0.313)
+
+[node name="ShootRay" type="RayCast3D" parent="Head/Camera3D"]
+target_position = Vector3(0, 0, -100)
+
+[node name="PlayerShootComponent" parent="." node_paths=PackedStringArray("ShootRay", "Gun") instance=ExtResource("3_4e6kw")]
+ShootRay = NodePath("../Head/Camera3D/ShootRay")
+Gun = NodePath("../Head/Camera3D/Arms/RightHand/Gun")
+HitEffectScene = ExtResource("4_vnxro")
+SplashRadius = 10.0
+
+[node name="PlayerJuiceComponent" parent="." instance=ExtResource("4_1k7jn")]
+SlideHeadRotationAmount = 0.1
+SlideArmsRotationAmount = 0.6

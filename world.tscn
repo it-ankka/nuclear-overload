@@ -1,51 +1,174 @@
-[gd_scene load_steps=8 format=3 uid="uid://dvrdaefmuoxg5"]
+[gd_scene load_steps=18 format=3 uid="uid://dvrdaefmuoxg5"]
 
-[ext_resource type="Material" uid="uid://k860m0p38lm2" path="res://placeholder_material.tres" id="1_fnff3"]
-[ext_resource type="PackedScene" uid="uid://crmv6adiul5ca" path="res://player.tscn" id="2_yr7im"]
-[ext_resource type="PackedScene" uid="uid://bhb7lfbfcmgqe" path="res://kill_area.tscn" id="3_r8r7a"]
+[ext_resource type="Material" uid="uid://k860m0p38lm2" path="res://materials/placeholder_material.tres" id="1_fnff3"]
+[ext_resource type="Script" uid="uid://bqeo82byu24i6" path="res://scripts/Game.cs" id="1_qjlrn"]
+[ext_resource type="PackedScene" uid="uid://crmv6adiul5ca" path="res://scenes/player.tscn" id="2_yr7im"]
+[ext_resource type="PackedScene" uid="uid://bhb7lfbfcmgqe" path="res://scenes/kill_area.tscn" id="3_r8r7a"]
+[ext_resource type="Material" uid="uid://c3040oq02q7qe" path="res://materials/nuclear_waste_material.tres" id="4_i424e"]
+[ext_resource type="PackedScene" uid="uid://cxoh8gp1qjpoh" path="res://scenes/rabbit.tscn" id="6_lqiem"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tyy1c"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+[sub_resource type="Gradient" id="Gradient_prtnq"]
+offsets = PackedFloat32Array(0, 0.510917)
+colors = PackedColorArray(0, 0.472129, 0.964375, 1, 0.834718, 0.887287, 0.263754, 1)
 
-[sub_resource type="Sky" id="Sky_5ymyx"]
-sky_material = SubResource("ProceduralSkyMaterial_tyy1c")
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_k76dh"]
 
-[sub_resource type="Environment" id="Environment_fkdue"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_8e36v"]
+seamless = true
+color_ramp = SubResource("Gradient_prtnq")
+noise = SubResource("FastNoiseLite_k76dh")
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f5jag"]
+sky_top_color = Color(0.384314, 0.454902, 0.54902, 1)
+sky_cover = SubResource("NoiseTexture2D_8e36v")
+ground_bottom_color = Color(0.313726, 0.313726, 0.313726, 1)
+ground_curve = 0.177532
+
+[sub_resource type="Sky" id="Sky_dbf11"]
+sky_material = SubResource("ProceduralSkyMaterial_f5jag")
+
+[sub_resource type="Environment" id="Environment_3jyrn"]
 background_mode = 2
-sky = SubResource("Sky_5ymyx")
+sky = SubResource("Sky_dbf11")
+ambient_light_source = 3
+reflected_light_source = 2
 tonemap_mode = 2
-glow_enabled = true
+adjustment_enabled = true
+adjustment_saturation = 2.18
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mw8gy"]
+material = ExtResource("4_i424e")
+size = Vector2(10000, 10000)
+subdivide_width = 10
+subdivide_depth = 10
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_27yxx"]
 
+[sub_resource type="Animation" id="Animation_gn3rb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:uv1_offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_jugtm"]
+resource_name = "water loop"
+length = 600.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:uv1_offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 600),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.999, 0.999, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_gvaxh"]
+_data = {
+&"RESET": SubResource("Animation_gn3rb"),
+&"water_loop": SubResource("Animation_jugtm")
+}
+
 [node name="World" type="Node3D"]
+script = ExtResource("1_qjlrn")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_fkdue")
+environment = SubResource("Environment_3jyrn")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
 shadow_enabled = true
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.962, -21.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25, 0)
+material_override = ExtResource("1_fnff3")
 use_collision = true
 
-[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
-size = Vector3(15, 4, 50)
-material = ExtResource("1_fnff3")
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -31, 12)
+size = Vector3(20, 80, 20)
 
-[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D/CSGBox3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10.0146)
-operation = 2
-size = Vector3(14, 4, 69.0293)
-material = ExtResource("1_fnff3")
+[node name="CSGBox3D4" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -38, -53)
+size = Vector3(51, 66, 44)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="CSGCombiner3D/CSGBox3D4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 36, -16)
+size = Vector3(51, 6, 12)
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="CSGCombiner3D/CSGBox3D4/CSGBox3D5"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 25.5, -3, 15)
+polygon = PackedVector2Array(0, 0, -1, 0, 9, 6, 9, 0)
+depth = 6.0
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, -44, -175)
+size = Vector3(51, 66, 80)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="CSGCombiner3D/CSGBox3D5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.501099, 34, 48)
+size = Vector3(20.0598, 6, 40)
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="CSGCombiner3D/CSGBox3D5/CSGBox3D5"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 10, -1, -22)
+polygon = PackedVector2Array(-2, 0, -2, 4, 7, 1, 10, 0)
+depth = 20.0
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, -44, -302)
+size = Vector3(50, 66, 80)
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="CSGCombiner3D/CSGBox3D6"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 25, 33, 40)
+polygon = PackedVector2Array(1, 0, 0, 0, 80, 17, 80, 0)
+depth = 50.0
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, -22, -400)
+size = Vector3(145, 54, 80)
 
 [node name="Player" parent="." instance=ExtResource("2_yr7im")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 35, 17)
+RunSpeed = 24.0
 
-[node name="KillArea" parent="." instance=ExtResource("3_r8r7a")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 0)
+[node name="NuclearWaste" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="KillArea"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NuclearWaste"]
+mesh = SubResource("PlaneMesh_mw8gy")
+skeleton = NodePath("../..")
+
+[node name="KillArea" parent="NuclearWaste" instance=ExtResource("3_r8r7a")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NuclearWaste/KillArea"]
 shape = SubResource("WorldBoundaryShape3D_27yxx")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="NuclearWaste"]
+libraries = {
+&"": SubResource("AnimationLibrary_gvaxh")
+}
+autoplay = "water_loop"
+
+[node name="FogVolume" type="FogVolume" parent="."]
+
+[node name="Rabbit" parent="." instance=ExtResource("6_lqiem")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 20, -47)
+
+[node name="Rabbit2" parent="." instance=ExtResource("6_lqiem")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 20, -47)
+
+[node name="Rabbit3" parent="." instance=ExtResource("6_lqiem")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 20, -50)

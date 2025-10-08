@@ -1,0 +1,125 @@
+[gd_scene load_steps=19 format=3 uid="uid://bhwew2ta2wwyl"]
+
+[ext_resource type="Script" uid="uid://b7c6j7bvi2t8g" path="res://scripts/Effect.cs" id="1_5vy3e"]
+
+[sub_resource type="Gradient" id="Gradient_1tq35"]
+offsets = PackedFloat32Array(0, 0.71308)
+colors = PackedColorArray(1, 1, 1, 0.745098, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wffui"]
+gradient = SubResource("Gradient_1tq35")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_fgrxs"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_tu5sm"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ic7f2"]
+color_ramp = SubResource("Gradient_fgrxs")
+noise = SubResource("FastNoiseLite_tu5sm")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xrlse"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.494118)
+albedo_texture = SubResource("GradientTexture2D_wffui")
+detail_enabled = true
+detail_mask = SubResource("NoiseTexture2D_ic7f2")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_gj15o"]
+material = SubResource("StandardMaterial3D_xrlse")
+size = Vector2(2, 2)
+
+[sub_resource type="Curve" id="Curve_1ynl5"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.810631, 1), 0.0, 0.0, 0, 0, Vector2(0.893688, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Gradient" id="Gradient_3rg7j"]
+offsets = PackedFloat32Array(0.122363, 0.71308)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_23x2p"]
+gradient = SubResource("Gradient_3rg7j")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_sww75"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 0.603922, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kmdvh"]
+gradient = SubResource("Gradient_sww75")
+use_hdr = true
+
+[sub_resource type="Gradient" id="Gradient_hia00"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_dj045"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h1t55"]
+color_ramp = SubResource("Gradient_hia00")
+noise = SubResource("FastNoiseLite_dj045")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v445f"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.941176, 0, 0, 0.501961)
+albedo_texture = SubResource("GradientTexture2D_23x2p")
+detail_enabled = true
+detail_mask = SubResource("NoiseTexture2D_h1t55")
+detail_albedo = SubResource("GradientTexture1D_kmdvh")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_yesml"]
+material = SubResource("StandardMaterial3D_v445f")
+size = Vector2(2, 2)
+
+[node name="ExplosionEffect" type="Node3D"]
+script = ExtResource("1_5vy3e")
+
+[node name="ExplosionSmokeParticles" type="CPUParticles3D" parent="."]
+sorting_use_aabb_center = false
+amount = 50
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+lifetime_randomness = 0.6
+mesh = SubResource("QuadMesh_gj15o")
+direction = Vector3(0, 1, 0)
+gravity = Vector3(0, 3, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 3.0
+scale_amount_min = 0.0
+scale_amount_curve = SubResource("Curve_1ynl5")
+
+[node name="ExplosionFireParticles" type="CPUParticles3D" parent="."]
+sorting_use_aabb_center = false
+amount = 50
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+lifetime_randomness = 0.6
+mesh = SubResource("QuadMesh_yesml")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 9.8, 0)
+initial_velocity_max = 3.0
+scale_amount_min = 0.0
+scale_amount_curve = SubResource("Curve_1ynl5")
+
+[connection signal="ready" from="." to="ExplosionSmokeParticles" method="set_emitting" binds= [true]]
+[connection signal="ready" from="." to="ExplosionFireParticles" method="set_emitting" binds= [true]]
+[connection signal="finished" from="ExplosionFireParticles" to="." method="emit_signal" binds= [&"Finished"]]

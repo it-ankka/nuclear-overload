@@ -1,0 +1,57 @@
+[gd_scene load_steps=10 format=3 uid="uid://66r5w7wh47o8"]
+
+[ext_resource type="PackedScene" uid="uid://ds5pajlxmj3i1" path="res://models/blasters/blasterG.glb" id="1_hap0p"]
+[ext_resource type="Script" uid="uid://crehga5s7cl8k" path="res://scripts/Gun.cs" id="2_v5y66"]
+[ext_resource type="PackedScene" uid="uid://ceofp7kgdacxb" path="res://scenes/muzzle_flash_effect.tscn" id="3_tau3c"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_378tj"]
+albedo_color = Color(0.27451, 0.54902, 0.847059, 1)
+
+[sub_resource type="Gradient" id="Gradient_che5d"]
+colors = PackedColorArray(0, 0, 0, 1, 0.54099, 0.54099, 0.54099, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0g2ly"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5ywxv"]
+color_ramp = SubResource("Gradient_che5d")
+noise = SubResource("FastNoiseLite_0g2ly")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3skrn"]
+transparency = 1
+albedo_color = Color(0.65098, 0.572549, 0, 0.788235)
+emission_enabled = true
+emission = Color(0.823529, 0.670588, 0, 1)
+emission_energy_multiplier = 4.79
+emission_texture = SubResource("NoiseTexture2D_5ywxv")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_r0he1"]
+material = SubResource("StandardMaterial3D_3skrn")
+top_radius = 0.02
+bottom_radius = 0.1
+radial_segments = 5
+
+[node name="Gun" node_paths=PackedStringArray("Muzzle", "LaserNode") instance=ExtResource("1_hap0p")]
+script = ExtResource("2_v5y66")
+RecoilAmplitude = Vector3(1, 1, 2)
+ResetTime = 0.3
+Muzzle = NodePath("Muzzle")
+LaserNode = NodePath("Muzzle/Laser")
+MuzzleFlashEffectScene = ExtResource("3_tau3c")
+
+[node name="blasterG" parent="." index="0"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+surface_material_override/3 = SubResource("StandardMaterial3D_378tj")
+
+[node name="Muzzle" type="Node3D" parent="." index="1"]
+editor_description = "Muzzle"
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0744439, -0.366476)
+
+[node name="Laser" type="Node3D" parent="Muzzle" index="0"]
+visible = false
+
+[node name="LaserMesh" type="MeshInstance3D" parent="Muzzle/Laser" index="0"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -1)
+mesh = SubResource("CylinderMesh_r0he1")
+skeleton = NodePath("../..")

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://djftxkps5voyo"]
+
+[ext_resource type="Script" uid="uid://blplenvntnkvf" path="res://scripts/PlayerShootComponent.cs" id="1_iy6mw"]
+
+[sub_resource type="Curve" id="Curve_smdio"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="PlayerShootComponent" type="Node"]
+script = ExtResource("1_iy6mw")
+SplashRadius = 7.0
+ImpactMaxPushback = 10.0
+ImpactFalloff = SubResource("Curve_smdio")
